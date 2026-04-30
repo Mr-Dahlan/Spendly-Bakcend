@@ -2,47 +2,77 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\NotificationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(protected NotificationService $notificationService) {}
+
+    // GET /api/notifications
+    // Optional: ?is_read=false untuk filter belum dibaca
+    public function index(Request $request): JsonResponse
     {
-        //
+        $filters = [];
+
+        if ($request->query('is_read') !== null) {
+            $filters['is_read'] = $request->query('is_read');
+        }
+
+        $notifications = $this->notificationService->getAll($filters);
+        $unreadCount   = $this->notificationService->countUnread();
+
+        return response()->json([
+            'success'      => true,
+            'unread_count' => $unreadCount,
+            'data'         => $notifications,
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // PATCH /api/notifications/{id}/read
+    public function markAsRead(int $id): JsonResponse
     {
-        //
+        $notif = $this->notificationService->markAsRead($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi ditandai sudah dibaca.',
+            'data'    => $notif,
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // DELETE /api/notifications/{id}
+    public function destroy(int $id): JsonResponse
     {
-        //
+        $this->notificationService->delete($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi berhasil dihapus.',
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // POST /api/admin/notifications/send (khusus admin)
+    public function send(Request $request): JsonResponse
     {
-        //
-    }
+        $validated = $request->validate([
+            'title'   => 'required|string|max:255',
+            'message' => 'required|string',
+            'user_id' => 'nullable|integer|exists:users,user_id',
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $this->notificationService->send(
+            $validated['title'],
+            $validated['message'],
+            $validated['user_id'] ?? null
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => $validated['user_id']
+                ? 'Notifikasi berhasil dikirim ke user.'
+                : 'Notifikasi berhasil dikirim ke semua user.',
+        ], 201);
     }
 }

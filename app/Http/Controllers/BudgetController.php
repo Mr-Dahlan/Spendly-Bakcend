@@ -2,47 +2,101 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\BudgetService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BudgetController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(protected BudgetService $budgetService) {}
+
+    // GET /api/budgets
+    public function index(): JsonResponse
     {
-        //
+        $budgets = $this->budgetService->getAll();
+
+        return response()->json([
+            'success' => true,
+            'data'    => $budgets,
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // POST /api/budgets
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'category_id'  => 'required|integer|exists:categories,category_id',
+            'amount_limit' => 'required|numeric|min:1',
+            'due_date'     => 'required|date|after_or_equal:today',
+        ]);
+
+        $budget = $this->budgetService->create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Budget berhasil dibuat.',
+            'data'    => $budget,
+        ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // GET /api/budgets/{id}
+    public function show(int $id): JsonResponse
     {
-        //
+        $budget = $this->budgetService->getDetail($id);
+
+        if (!$budget) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data'    => $budget,
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // PATCH /api/budgets/{id}
+    public function update(Request $request, int $id): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'category_id'  => 'sometimes|required|integer|exists:categories,category_id',
+            'amount_limit' => 'sometimes|required|numeric|min:1',
+            'due_date'     => 'sometimes|required|date',
+        ]);
+
+        $budget = $this->budgetService->update($id, $validated);
+
+        if (!$budget) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Budget berhasil diupdate.',
+            'data'    => $budget,
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    // DELETE /api/budgets/{id}
+    public function destroy(int $id): JsonResponse
     {
-        //
+        $deleted = $this->budgetService->delete($id);
+
+        if (!$deleted) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Budget berhasil dihapus.',
+        ]);
     }
 }

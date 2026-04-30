@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Services\UserService;
@@ -18,7 +19,6 @@ class UserController extends Controller
     public function index()
     {
         $result = $this->userService->getAllUsers();
-
         return response()->json([
             'message' => 'Berhasil mengambil semua user',
             ...$result,
@@ -28,7 +28,6 @@ class UserController extends Controller
     public function show(int $id)
     {
         $result = $this->userService->getUserById($id);
-
         return response()->json([
             'message' => 'Berhasil mengambil user',
             ...$result,
@@ -44,9 +43,36 @@ class UserController extends Controller
         ]);
 
         $result = $this->userService->updateUser($id, $validated);
-
         return response()->json([
             'message' => 'Berhasil update user',
+            ...$result,
+        ]);
+    }
+
+    // PATCH /api/admin/users/{id}/status
+    public function updateStatus(Request $request, int $id)
+    {
+        $validated = $request->validate([
+            'status' => 'required|boolean',
+        ]);
+
+        $result = $this->userService->updateStatus($id, $validated['status']);
+        return response()->json([
+            'message' => 'Berhasil update status user',
+            ...$result,
+        ]);
+    }
+
+    // PATCH /api/admin/users/{id}/role
+    public function updateRole(Request $request, int $id)
+    {
+        $validated = $request->validate([
+            'role' => 'required|in:user,admin',
+        ]);
+
+        $result = $this->userService->updateRole($id, $validated['role']);
+        return response()->json([
+            'message' => 'Berhasil update role user',
             ...$result,
         ]);
     }
@@ -54,7 +80,6 @@ class UserController extends Controller
     public function destroy(int $id)
     {
         $this->userService->deleteUser($id);
-
         return response()->json([
             'message' => 'Berhasil menghapus user',
         ]);
@@ -64,7 +89,6 @@ class UserController extends Controller
 
     public function userUpdate(Request $request)
     {
-        // ambil id dari token yang login, bukan dari parameter
         $id = $request->user()->user_id;
 
         $validated = $request->validate([
@@ -74,7 +98,6 @@ class UserController extends Controller
         ]);
 
         $result = $this->userService->updateUser($id, $validated);
-
         return response()->json([
             'message' => 'Berhasil update profil',
             ...$result,
