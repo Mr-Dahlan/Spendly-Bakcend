@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,33 +10,30 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * Mass assignable fields
-     */
     protected $primaryKey = 'user_id';
-    
+
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',      // tambah
+        'status',    // tambah
+        'last_login', // tambah
+        'mode',
     ];
 
-    /**
-     * Hidden fields (tidak tampil di API response)
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Type casting
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
+            'last_login'        => 'datetime', // tambah
+            'status'            => 'boolean',  // tambah — otomatis jadi true/false
         ];
     }
 }

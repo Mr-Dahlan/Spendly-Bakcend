@@ -31,7 +31,7 @@ class AuthService
 
         if (! $user || ! Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Email atau password salah.'],
+                'data' => ['Email atau password salah.'],
             ]);
         }
 
