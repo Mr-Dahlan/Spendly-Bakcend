@@ -21,6 +21,19 @@ class AdminLogService
     }
 
     /**
+     * Buat log secara manual via request (dari controller store)
+     */
+    public function create(array $data): AdminLog
+    {
+        return AdminLog::create([
+            'admin_id'       => Auth::id(),
+            'target_user_id' => $data['target_user_id'],
+            'action'         => $data['action'],
+            'description'    => $data['description'],
+        ]);
+    }
+
+    /**
      * Ambil semua log dengan filter opsional
      */
     public function getAll(array $filters = [])

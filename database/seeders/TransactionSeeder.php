@@ -9,7 +9,7 @@ class TransactionSeeder extends Seeder
 {
     public function run(): void
     {
-        $userId     = 1; // Hamim
+        $userId     = 2; // Hamim
         $categoryId = 1; // Category milik Hamim
 
         $transactions = [
@@ -43,50 +43,6 @@ class TransactionSeeder extends Seeder
                 'amount'           => 300000,
                 'description'      => 'Belanja bulanan',
                 'transaction_date' => '2026-04-12',
-            ],
-            [
-                'type'             => 'expense',
-                'amount'           => 200000,
-                'description'      => 'Tagihan listrik',
-                'transaction_date' => '2026-04-15',
-            ],
-            [
-                'type'             => 'income',
-                'amount'           => 500000,
-                'description'      => 'Bonus kinerja',
-                'transaction_date' => '2026-04-20',
-            ],
-            [
-                'type'             => 'expense',
-                'amount'           => 100000,
-                'description'      => 'Nonton bioskop',
-                'transaction_date' => '2026-04-22',
-            ],
-
-            // ── Mei 2026 ──
-            [
-                'type'             => 'income',
-                'amount'           => 5000000,
-                'description'      => 'Gaji bulan Mei',
-                'transaction_date' => '2026-05-01',
-            ],
-            [
-                'type'             => 'expense',
-                'amount'           => 175000,
-                'description'      => 'Makan malam bersama',
-                'transaction_date' => '2026-05-02',
-            ],
-            [
-                'type'             => 'expense',
-                'amount'           => 80000,
-                'description'      => 'Parkir & bensin',
-                'transaction_date' => '2026-05-04',
-            ],
-            [
-                'type'             => 'income',
-                'amount'           => 300000,
-                'description'      => 'Jual barang bekas',
-                'transaction_date' => '2026-05-06',
             ],
         ];
 
