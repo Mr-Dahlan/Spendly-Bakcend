@@ -16,9 +16,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',      // tambah
-        'status',    // tambah
-        'last_login', // tambah
+        'role',      
+        'status',    
+        'last_login', 
         'mode',
     ];
 
@@ -32,8 +32,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
-            'last_login'        => 'datetime', // tambah
-            'status'            => 'boolean',  // tambah — otomatis jadi true/false
+            'last_login'        => 'datetime', 
+            'status'            => 'boolean',  
         ];
     }
 }
