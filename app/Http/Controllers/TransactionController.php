@@ -40,7 +40,7 @@ public function index(Request $request): JsonResponse
             'category_id'      => 'required|integer|exists:categories,category_id',
             'type'             => 'required|in:income,expense',
             'amount'           => 'required|numeric|min:0',
-            'description'      => 'required|string',
+            'description'      => 'nullable|string',
             'transaction_date' => 'required|date',
         ]);
 
@@ -57,63 +57,63 @@ public function index(Request $request): JsonResponse
     public function show(int $id): JsonResponse
     {
         $transaction = $this->transactionService->findOrFail($id);
-    
+
         if (is_array($transaction) && !$transaction['found']) {
             return response()->json([
                 'success' => false,
                 'message' => $transaction['message'],
             ], 404);
         }
-    
+
         return response()->json([
             'success' => true,
             'data'    => $transaction,
         ]);
     }
-    
+
     // PUT /api/transactions/{id}
     public function update(Request $request, int $id): JsonResponse
     {
         $check = $this->transactionService->findOrFail($id);
-    
+
         if (is_array($check) && !$check['found']) {
             return response()->json([
                 'success' => false,
                 'message' => $check['message'],
             ], 404);
         }
-    
+
         $validated = $request->validate([
             'category_id'      => 'sometimes|required|integer|exists:categories,category_id',
             'type'             => 'sometimes|required|in:income,expense',
             'amount'           => 'sometimes|required|numeric|min:0',
-            'description'      => 'sometimes|required|string',
+            'description'      => 'sometimes|nullable|string',
             'transaction_date' => 'sometimes|required|date',
         ]);
-    
+
         $transaction = $this->transactionService->update($id, $validated);
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Transaksi berhasil diupdate.',
             'data'    => $transaction,
         ]);
     }
-    
+
     // DELETE /api/transactions/{id}
     public function destroy(int $id): JsonResponse
     {
         $check = $this->transactionService->findOrFail($id);
-    
+
         if (is_array($check) && !$check['found']) {
             return response()->json([
                 'success' => false,
                 'message' => $check['message'],
             ], 404);
         }
-    
+
         $this->transactionService->delete($id);
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Transaksi berhasil dihapus.',

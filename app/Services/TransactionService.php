@@ -89,7 +89,7 @@ class TransactionService
             'category_id'      => $data['category_id'],
             'type'             => $data['type'],
             'amount'           => $data['amount'],
-            'description'      => $data['description'],
+            'description'      => $data['description'] ?? '',
             'transaction_date' => $data['transaction_date'],
         ]);
     }
@@ -106,14 +106,14 @@ class TransactionService
             ->where('transaction_id', $id)
             ->where('user_id', Auth::id())
             ->first();
-    
+
         if (!$transaction) {
             return [
                 'found'   => false,
                 'message' => 'Data tidak ditemukan.',
             ];
         }
-    
+
         return $transaction;
     }
 
