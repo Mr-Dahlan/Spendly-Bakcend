@@ -68,9 +68,11 @@ class NotificationController extends Controller
             $validated['user_id'] ?? null
         );
 
+        $isSpecific = !empty($validated['user_id']);
+
         return response()->json([
             'success' => true,
-            'message' => $validated['user_id']
+            'message' => $isSpecific
                 ? 'Notifikasi berhasil dikirim ke user.'
                 : 'Notifikasi berhasil dikirim ke semua user.',
         ], 201);

@@ -11,6 +11,6 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // Route khusus admin
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
     Route::post('admin/notifications/send', [NotificationController::class, 'send']);
 });
