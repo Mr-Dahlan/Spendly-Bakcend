@@ -20,6 +20,8 @@ class User extends Authenticatable
         'status',    
         'last_login', 
         'mode',
+        'google_id',
+        'avatar',
     ];
 
     protected $hidden = [

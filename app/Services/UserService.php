@@ -59,12 +59,16 @@ class UserService
 
         $statusLabel = $status ? 'aktif' : 'nonaktif';
 
+        \Log::info('Sebelum log', ['user' => $user->name, 'id' => $id]);
+
         // Catat log
         $this->adminLogService->log(
             action: 'UPDATE_USER_STATUS',
             description: 'Status user ' . $user->name . ' diubah menjadi ' . $statusLabel . '.',
             targetUserId: $id
         );
+        
+        \Log::info('Setelah log');
 
         // Kirim notifikasi ke user
         $this->notificationService->send(

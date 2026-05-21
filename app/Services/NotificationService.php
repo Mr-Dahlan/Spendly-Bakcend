@@ -79,6 +79,18 @@ class NotificationService
         return $notif->fresh();
     }
 
+        /**
+     * Mark semua notifikasi user sebagai sudah dibaca
+     */
+    public function markAllAsRead(): int
+    {
+        return Notification::where('user_id', Auth::id())
+            ->where('is_read', false)
+            ->update([
+                'is_read' => true,
+            ]);
+    }
+
     /**
      * Hapus 1 notifikasi
      */

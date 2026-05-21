@@ -3,7 +3,7 @@
 use App\Http\Controllers\BudgetController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum','check_banned')->group(function () {
     Route::get('budgets',          [BudgetController::class, 'index']);
     Route::post('budgets',         [BudgetController::class, 'store']);
     Route::get('budgets/{id}',     [BudgetController::class, 'show']);
