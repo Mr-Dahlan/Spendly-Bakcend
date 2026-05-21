@@ -12,6 +12,11 @@ class AdminLogService
      */
     public function log(string $action, string $description, int|string $targetUserId): void
     {
+        \Log::info('AdminLog attempt', [
+            'admin_id' => Auth::id(),
+            'action'   => $action,
+        ]);
+    
         AdminLog::create([
             'admin_id'       => Auth::id(),
             'target_user_id' => $targetUserId,

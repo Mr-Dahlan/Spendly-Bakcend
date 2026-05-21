@@ -42,6 +42,17 @@ class NotificationController extends Controller
         ]);
     }
 
+    public function markAllAsRead(NotificationService $service)
+    {
+        $updated = $service->markAllAsRead();
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'All notifications marked as read',
+            'updated' => $updated,
+        ]);
+    }
+
     // DELETE /api/notifications/{id}
     public function destroy(int $id): JsonResponse
     {
@@ -62,10 +73,12 @@ class NotificationController extends Controller
             'user_id' => 'nullable|integer|exists:users,user_id',
         ]);
 
+        $userId = $validated['user_id'] ?? null;
+
         $this->notificationService->send(
             $validated['title'],
             $validated['message'],
-            $validated['user_id'] ?? null
+            $userId
         );
 
         $isSpecific = !empty($validated['user_id']);
