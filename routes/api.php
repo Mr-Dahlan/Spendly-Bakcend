@@ -7,4 +7,4 @@ require __DIR__.'/tableAPI/budgets.php';
 require __DIR__.'/tableAPI/notifications.php';
 require __DIR__.'/tableAPI/adminLogs.php';
 require __DIR__.'/tableAPI/auth.php';
-
+require __DIR__.'/tableAPI/passwordReset.php';
