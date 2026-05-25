@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Notifications\CustomResetPasswordNotification;
 
 class User extends Authenticatable
 {
@@ -16,9 +18,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',      
-        'status',    
-        'last_login', 
+        'role',
+        'status',
+        'last_login',
         'mode',
         'google_id',
         'avatar',
@@ -34,8 +36,13 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
-            'last_login'        => 'datetime', 
-            'status'            => 'boolean',  
+            'last_login'        => 'datetime',
+            'status'            => 'boolean',
         ];
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new CustomResetPasswordNotification($token));
     }
 }
