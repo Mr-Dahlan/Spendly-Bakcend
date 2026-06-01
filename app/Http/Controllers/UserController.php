@@ -85,9 +85,15 @@ class UserController extends Controller
     
         // Cek password cocok dengan user yang login
         if (!\Hash::check($validated['password'], $request->user()->password)) {
-            return response()->json(['message' => 'Password salah.'], 403);
+            return response()->json(['message' => 'Wrong Password.'], 403);
         }
     
+        $this->userService->deleteUser($id);
+        return response()->json(['message' => 'Berhasil menghapus user']);
+    }
+
+    public function destroyByAdmin( int $id)
+    {
         $this->userService->deleteUser($id);
         return response()->json(['message' => 'Berhasil menghapus user']);
     }
