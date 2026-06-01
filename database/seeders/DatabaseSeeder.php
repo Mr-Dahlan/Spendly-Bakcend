@@ -11,7 +11,8 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             NotificationSeeder::class,
             TransactionSeeder::class,
-            BudgetSeeder::class
+            BudgetSeeder::class,
+            CategorySeeder::class,
         ]);
     }
 }

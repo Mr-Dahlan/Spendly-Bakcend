@@ -77,12 +77,25 @@ class UserController extends Controller
         ]);
     }
 
-    public function destroy(int $id)
+    public function destroy(Request $request, int $id)
+    {
+        $validated = $request->validate([
+            'password' => 'required|string',
+        ]);
+    
+        // Cek password cocok dengan user yang login
+        if (!\Hash::check($validated['password'], $request->user()->password)) {
+            return response()->json(['message' => 'Wrong Password.'], 403);
+        }
+    
+        $this->userService->deleteUser($id);
+        return response()->json(['message' => 'Berhasil menghapus user']);
+    }
+
+    public function destroyByAdmin( int $id)
     {
         $this->userService->deleteUser($id);
-        return response()->json([
-            'message' => 'Berhasil menghapus user',
-        ]);
+        return response()->json(['message' => 'Berhasil menghapus user']);
     }
 
     // ===== USER SENDIRI =====

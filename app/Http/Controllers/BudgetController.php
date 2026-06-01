@@ -8,9 +8,13 @@ use Illuminate\Http\Request;
 
 class BudgetController extends Controller
 {
-    public function __construct(protected BudgetService $budgetService) {}
+    public function __construct(
+        protected BudgetService $budgetService
+    ) {}
 
-    // GET /api/budgets
+    /**
+     * GET /api/budgets
+     */
     public function index(): JsonResponse
     {
         $budgets = $this->budgetService->getAll();
@@ -21,13 +25,16 @@ class BudgetController extends Controller
         ]);
     }
 
-    // POST /api/budgets
+    /**
+     * POST /api/budgets
+     */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'category_id'  => 'required|integer|exists:categories,category_id',
             'amount_limit' => 'required|numeric|min:1',
-            'due_date'     => 'required|date|after_or_equal:today',
+            'period'       => 'required|in:weekly,monthly,yearly',
+            'start_date'   => 'required|date|after_or_equal:today',
         ]);
 
         $budget = $this->budgetService->create($validated);
@@ -39,7 +46,9 @@ class BudgetController extends Controller
         ], 201);
     }
 
-    // GET /api/budgets/{id}
+    /**
+     * GET /api/budgets/{id}
+     */
     public function show(int $id): JsonResponse
     {
         $budget = $this->budgetService->getDetail($id);
@@ -57,13 +66,16 @@ class BudgetController extends Controller
         ]);
     }
 
-    // PATCH /api/budgets/{id}
+    /**
+     * PATCH /api/budgets/{id}
+     */
     public function update(Request $request, int $id): JsonResponse
     {
         $validated = $request->validate([
             'category_id'  => 'sometimes|required|integer|exists:categories,category_id',
             'amount_limit' => 'sometimes|required|numeric|min:1',
-            'due_date'     => 'sometimes|required|date',
+            'period'       => 'sometimes|required|in:weekly,monthly,yearly',
+            'start_date'   => 'sometimes|required|date|after_or_equal:today',
         ]);
 
         $budget = $this->budgetService->update($id, $validated);
@@ -82,7 +94,9 @@ class BudgetController extends Controller
         ]);
     }
 
-    // DELETE /api/budgets/{id}
+    /**
+     * DELETE /api/budgets/{id}
+     */
     public function destroy(int $id): JsonResponse
     {
         $deleted = $this->budgetService->delete($id);

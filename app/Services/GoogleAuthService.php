@@ -17,7 +17,7 @@ class GoogleAuthService
         ]);
 
         if ($response->failed()) {
-            throw new \Exception('Gagal mengambil data dari Google.');
+            throw new \Exception('Failed to fetch Google user.');
         }
 
         return $response->json();

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Budget;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class BudgetService
 {
@@ -13,31 +14,51 @@ class BudgetService
 
     /**
      * Hitung detail pemakaian budget
-     */
+             */
     private function calculateUsage(Budget $budget): array
     {
-        // Total expense pada kategori ini sampai due_date
+        $startDate = Carbon::parse($budget->start_date);
+    
+        $endDate = match($budget->period) {
+            'weekly' => $startDate->copy()->addWeek(),
+            'yearly' => $startDate->copy()->addYearNoOverflow(),
+            default  => $startDate->copy()->addMonthNoOverflow(),
+        };
+    
         $spent = Transaction::where('user_id', Auth::id())
             ->where('category_id', $budget->category_id)
             ->where('type', 'expense')
-            ->whereDate('transaction_date', '<=', $budget->due_date)
+            ->whereDate('transaction_date', '>=', $startDate)
+            ->whereDate('transaction_date', '<', $endDate)
             ->sum('amount');
-
+    
         $limit      = (float) $budget->amount_limit;
         $spent      = (float) $spent;
         $remaining  = $limit - $spent;
-        $percentage = $limit > 0 ? round(($spent / $limit) * 100, 2) : 0;
-
+        $percentage = $limit > 0
+            ? round(($spent / $limit) * 100, 2)
+            : 0;
+    
         return [
             'amount_limit' => $limit,
             'spent'        => $spent,
             'remaining'    => max(0, $remaining),
             'percentage'   => $percentage,
+    
             'is_exceeded'  => $spent > $limit,
-            'is_warning'   => !($spent > $limit) && $percentage >= self::WARNING_THRESHOLD,
-            'status'       => $spent > $limit
+    
+            'is_warning'   => !($spent > $limit)
+                && $percentage >= self::WARNING_THRESHOLD,
+    
+            'status' => $spent > $limit
                 ? 'exceeded'
-                : ($percentage >= self::WARNING_THRESHOLD ? 'warning' : 'safe'),
+                : ($percentage >= self::WARNING_THRESHOLD
+                    ? 'warning'
+                    : 'safe'),
+    
+            'period'     => $budget->period,
+            'start_date' => $startDate->toDateString(),
+            'end_date'   => $endDate->toDateString(),
         ];
     }
 
@@ -48,7 +69,7 @@ class BudgetService
     {
         $budgets = Budget::with('category')
             ->where('user_id', Auth::id())
-            ->orderBy('due_date', 'asc')
+            ->orderBy('start_date', 'asc')
             ->get();
 
         return $budgets->map(function ($budget) {
@@ -94,38 +115,33 @@ class BudgetService
             'user_id'      => Auth::id(),
             'category_id'  => $data['category_id'],
             'amount_limit' => $data['amount_limit'],
-            'due_date'     => $data['due_date'],
+            'period'       => $data['period'] ?? 'monthly',
+            'start_date'   => $data['start_date'],
         ]);
-
+    
         $budget->load('category');
-
+    
         return array_merge(
             $budget->toArray(),
             ['usage' => $this->calculateUsage($budget)]
         );
     }
-
-    /**
-     * Update budget (PATCH — sebagian field)
-     */
+    
+    
     public function update(int $id, array $data): ?array
     {
         $budget = $this->find($id);
-
         if (!$budget) return null;
-
+    
         $budget->update([
             'category_id'  => $data['category_id']  ?? $budget->category_id,
             'amount_limit' => $data['amount_limit']  ?? $budget->amount_limit,
-            'due_date'     => $data['due_date']      ?? $budget->due_date,
+            'period'       => $data['period']        ?? $budget->period, // ← tambah
+            'start_date' => $data['start_date'] ?? $budget->start_date,
         ]);
-
+    
         $budget = $budget->fresh('category');
-
-        return array_merge(
-            $budget->toArray(),
-            ['usage' => $this->calculateUsage($budget)]
-        );
+        return array_merge($budget->toArray(), ['usage' => $this->calculateUsage($budget)]);
     }
 
     /**

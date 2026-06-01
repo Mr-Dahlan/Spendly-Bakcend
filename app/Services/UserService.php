@@ -9,13 +9,14 @@ use App\Services\NotificationService;
 class UserService
 {
     public function __construct(
-        protected AdminLogService    $adminLogService,
+        protected AdminLogService $adminLogService,
         protected NotificationService $notificationService
     ) {}
 
     public function getAllUsers(): array
     {
         $users = User::all();
+
         return ['data' => $users];
     }
 
@@ -41,13 +42,22 @@ class UserService
     public function deleteUser(int $id): void
     {
         $user = User::findOrFail($id);
+
+        $user->tokens()->delete();
+        $user->delete();
+    }
+
+    public function deleteUserByAdmin(int $id): void
+    {
+        $user = User::findOrFail($id);
+
         $user->tokens()->delete();
         $user->delete();
 
-        // Catat log
+        // Record admin log
         $this->adminLogService->log(
             action: 'DELETE_USER',
-            description: 'User ' . $user->name . ' (' . $user->email . ') telah dihapus.',
+            description: 'User ' . $user->name . ' (' . $user->email . ') has been deleted.',
             targetUserId: $id
         );
     }
@@ -55,25 +65,22 @@ class UserService
     public function updateStatus(int $id, bool $status): array
     {
         $user = User::where('user_id', $id)->firstOrFail();
+
         $user->update(['status' => $status]);
 
-        $statusLabel = $status ? 'aktif' : 'nonaktif';
+        $statusLabel = $status ? 'active' : 'inactive';
 
-        \Log::info('Sebelum log', ['user' => $user->name, 'id' => $id]);
-
-        // Catat log
+        // Record admin log
         $this->adminLogService->log(
             action: 'UPDATE_USER_STATUS',
-            description: 'Status user ' . $user->name . ' diubah menjadi ' . $statusLabel . '.',
+            description: 'User status for ' . $user->name . ' has been changed to ' . $statusLabel . '.',
             targetUserId: $id
         );
-        
-        \Log::info('Setelah log');
 
-        // Kirim notifikasi ke user
+        // Send notification to user
         $this->notificationService->send(
-            title: 'Status Akun Diperbarui',
-            message: 'Status akun kamu telah diubah menjadi ' . $statusLabel . '.',
+            title: 'Account Status Updated',
+            message: 'Your account status has been changed to ' . $statusLabel . '.',
             userId: $id
         );
 
@@ -83,19 +90,20 @@ class UserService
     public function updateRole(int $id, string $role): array
     {
         $user = User::where('user_id', $id)->firstOrFail();
+
         $user->update(['role' => $role]);
 
-        // Catat log
+        // Record admin log
         $this->adminLogService->log(
             action: 'UPDATE_USER_ROLE',
-            description: 'Role user ' . $user->name . ' diubah menjadi ' . $role . '.',
+            description: 'User role for ' . $user->name . ' has been changed to ' . $role . '.',
             targetUserId: $id
         );
 
-        // Kirim notifikasi ke user
+        // Send notification to user
         $this->notificationService->send(
-            title: 'Role Akun Diperbarui',
-            message: 'Role akun kamu telah diubah menjadi ' . $role . '.',
+            title: 'Account Role Updated',
+            message: 'Your account role has been changed to ' . $role . '.',
             userId: $id
         );
 
