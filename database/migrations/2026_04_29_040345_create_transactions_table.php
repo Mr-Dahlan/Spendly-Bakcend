@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('category_id');
             $table->string('type',100);
-            $table->decimal('amount',100,2);
+            $table->decimal('amount',50,2);
             $table->text('description');
             $table->date('transaction_date');
 

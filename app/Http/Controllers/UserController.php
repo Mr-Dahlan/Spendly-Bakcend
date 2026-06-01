@@ -77,12 +77,19 @@ class UserController extends Controller
         ]);
     }
 
-    public function destroy(int $id)
+    public function destroy(Request $request, int $id)
     {
-        $this->userService->deleteUser($id);
-        return response()->json([
-            'message' => 'Berhasil menghapus user',
+        $validated = $request->validate([
+            'password' => 'required|string',
         ]);
+    
+        // Cek password cocok dengan user yang login
+        if (!\Hash::check($validated['password'], $request->user()->password)) {
+            return response()->json(['message' => 'Password salah.'], 403);
+        }
+    
+        $this->userService->deleteUser($id);
+        return response()->json(['message' => 'Berhasil menghapus user']);
     }
 
     // ===== USER SENDIRI =====

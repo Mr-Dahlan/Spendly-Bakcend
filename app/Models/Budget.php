@@ -16,21 +16,31 @@ class Budget extends Model
         'user_id',
         'category_id',
         'amount_limit',
-        'due_date',
+        'period',
+        'start_date',
     ];
 
     protected $casts = [
         'amount_limit' => 'decimal:2',
-        'due_date'     => 'date',
+        'start_date'   => 'date',
+        'period'       => 'string',
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(
+            User::class,
+            'user_id',
+            'user_id'
+        );
     }
 
     public function category()
     {
-        return $this->belongsTo(Category::class, 'category_id', 'category_id');
+        return $this->belongsTo(
+            Category::class,
+            'category_id',
+            'category_id'
+        );
     }
 }
