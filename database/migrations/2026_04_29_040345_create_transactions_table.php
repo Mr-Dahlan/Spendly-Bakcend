@@ -16,13 +16,13 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('category_id');
             $table->string('type',100);
-            $table->decimal('amount',15,2);
+            $table->decimal('amount',100,2);
             $table->text('description');
             $table->date('transaction_date');
 
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->foreign('category_id')->references('category_id')->on('categories')->onDelete('cascade');
-            
+
             $table->timestamps();
         });
     }

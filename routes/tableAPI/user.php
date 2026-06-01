@@ -11,12 +11,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
 
     Route::patch('/users/update-profile', [UserController::class, 'userUpdate']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
     Route::middleware('is_admin','check_banned')->group(function () {
         Route::get('/users',         [UserController::class, 'index']);
         Route::get('/users/{id}',    [UserController::class, 'show']);
         Route::patch('/users/{id}',  [UserController::class, 'adminUpdate']);
-        Route::delete('/users/{id}', [UserController::class, 'destroy']);
         Route::patch('/admin/users/{id}/status', [UserController::class, 'updateStatus']);
         Route::patch('/admin/users/{id}/role',   [UserController::class, 'updateRole']);
     });

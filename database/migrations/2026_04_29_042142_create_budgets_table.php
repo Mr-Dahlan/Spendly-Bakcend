@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('budget_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('category_id');
-            $table->decimal('amount_limit',15,2);
+            $table->decimal('amount_limit',100,2);
             $table->date('due_date');
 
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
