@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Middleware\HandleCors;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'is_admin' => \App\Http\Middleware\IsAdmin::class,
             'check_banned' => \App\Http\Middleware\CheckBanned::class
         ]);
+
+        $middleware->prepend(HandleCors::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
        // 1. Model tidak ditemukan → 404
@@ -61,5 +64,5 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 500);
         }
     });
-    
+
     })->create();
